@@ -12,7 +12,7 @@ from collections import namedtuple
 Color = namedtuple('Color', '  R     G     B')
 
 from Utils import local_path, default_output_path
-from Messages import *
+from Messages import read_messages, repack_messages
 from MQ import patch_files, File, update_dmadata, insert_space, add_relocations
 
 TunicColors = {
@@ -171,7 +171,7 @@ def patch_rom(world, rom):
         symbol = rom.sym('JABU_ENABLE')
         rom.write_byte(symbol, 0x01)
 
-    # Force language to be English in the event a Japanese rom was submitted
+    # Force language to be English in the event an JP rom was submitted
     rom.write_byte(0x3E, 0x45)
 
     # Can always return to youth
@@ -935,8 +935,8 @@ def patch_rom(world, rom):
 
     # Load Message and Shop Data
     messages = read_messages(rom)
-    shop_items = read_shop_items(rom, shop_item_file.start + 0x1DEC)
-    remove_unused_messages(messages)
+    #shop_items = read_shop_items(rom, shop_item_file.start + 0x1DEC)
+    #remove_unused_messages(messages)
 
     # Revert Song Get Override Injection
     if not world.shuffle_song_items:
@@ -968,17 +968,17 @@ def patch_rom(world, rom):
         rom.write_int32(0xAE80A8, 0xA4A00030) # sh  zero,48(a1)
         rom.write_int32(0xAE80B4, 0x06000003) # bltz s0, +0003
 
-    # give dungeon items the correct messages
-    message_patch_for_dungeon_items(messages, shop_items, world)
+    # # give dungeon items the correct messages
+    # message_patch_for_dungeon_items(messages, shop_items, world)
 
-    # reduce item message lengths
-    update_item_messages(messages, world)
+    # # reduce item message lengths
+    # update_item_messages(messages, world)
 
-    #update misc messages
-    update_misc_messages(messages)
+    # #update misc messages
+    # update_misc_messages(messages)
 
     repack_messages(rom, messages)
-    write_shop_items(rom, shop_item_file.start + 0x1DEC, shop_items)
+    # write_shop_items(rom, shop_item_file.start + 0x1DEC, shop_items)
 
     # actually write the save table to rom
     write_save_table(rom)
